@@ -116,6 +116,7 @@ export const ImageCompressor = () => {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d")!;
 
+      ctx.clearRect(0, 0, img.width, img.height);
       canvas.width = img.width;
       canvas.height = img.height;
       ctx.drawImage(img, 0, 0);
@@ -134,11 +135,10 @@ export const ImageCompressor = () => {
     }
   };
 
-  const handleQualityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newQuality = Number(e.target.value) / 100;
-    setCompressionQuality(newQuality);
+  const handleQualityChange = (quality: number) => {
+    setCompressionQuality(quality);
     if (image) {
-      debouncedCompress(image, newQuality);
+      debouncedCompress(image, quality);
     }
   };
 
@@ -206,11 +206,11 @@ export const ImageCompressor = () => {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span>{t('sizes.compressed')}:</span>
-                  <span className="font-mono">{(compressedSize / 1024).toFixed(2)} KB</span>
+                  <span className="font-mono">{(image.size * compressionQuality / 1024).toFixed(2)} KB</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span>{t('sizes.ratio')}:</span>
-                  <span className="font-mono">{((1 - compressedSize / image.size) * 100).toFixed(1)}%</span>
+                  <span className="font-mono">{((1 - compressionQuality) * 100).toFixed(1)}%</span>
                 </div>
               </div>
             </div>
@@ -219,16 +219,41 @@ export const ImageCompressor = () => {
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-sm">{t('compression.quality')}</span>
-                  <span className="text-sm font-mono">{Math.round(compressionQuality * 100)}%</span>
+                  <span className="text-sm font-mono">
+                    {compressionQuality === 0.7 ? t('quality.high') : 
+                     compressionQuality === 0.3 ? t('quality.medium') : 
+                     t('quality.low')}
+                  </span>
                 </div>
-                <input
-                  type="range"
-                  min="1"
-                  max="100"
-                  value={compressionQuality * 100}
-                  onChange={handleQualityChange}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
-                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleQualityChange(0.7)}
+                    className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors
+                      ${compressionQuality === 0.7 ? 
+                        'bg-blue-500 text-white' : 
+                        'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
+                  >
+                    {t('quality.high')}
+                  </button>
+                  <button
+                    onClick={() => handleQualityChange(0.3)}
+                    className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors
+                      ${compressionQuality === 0.3 ? 
+                        'bg-blue-500 text-white' : 
+                        'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
+                  >
+                    {t('quality.medium')}
+                  </button>
+                  <button
+                    onClick={() => handleQualityChange(0.1)}
+                    className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors
+                      ${compressionQuality === 0.1 ? 
+                        'bg-blue-500 text-white' : 
+                        'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
+                  >
+                    {t('quality.low')}
+                  </button>
+                </div>
               </div>
             </div>
 

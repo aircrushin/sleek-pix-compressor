@@ -31,6 +31,11 @@ const resources = {
       },
       compression: {
         quality: 'Compression Quality'
+      },
+      quality: {
+        high: 'High',
+        medium: 'Medium',
+        low: 'Low'
       }
     },
   },
@@ -63,6 +68,11 @@ const resources = {
       },
       compression: {
         quality: '压缩质量'
+      },
+      quality: {
+        high: '高',
+        medium: '中',
+        low: '低'
       }
     },
   },
