@@ -113,7 +113,7 @@ export const ImageCompressor = () => {
   return (
     <div className="w-full max-w-3xl mx-auto p-6 space-y-6">
       <div
-        className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center cursor-pointer transition-colors hover:border-gray-400 relative"
+        className="border-2 border-dashed border-gray-600 rounded-lg p-12 text-center cursor-pointer transition-colors hover:border-gray-400 relative bg-secondary/50"
         onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
       >
@@ -126,16 +126,18 @@ export const ImageCompressor = () => {
         <div className="space-y-4">
           <Upload className="w-12 h-12 mx-auto text-gray-400" />
           <div>
-            <p className="text-xl font-medium">Drag and drop your image here</p>
-            <p className="text-sm text-gray-500 mt-2">or click to browse</p>
+            <p className="text-xl font-medium text-gray-200">
+              Drag and drop your image here
+            </p>
+            <p className="text-sm text-gray-400 mt-2">or click to browse</p>
           </div>
         </div>
       </div>
 
       {image && (
         <div className="space-y-6 animate-fade-in">
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <div className="aspect-video relative rounded-lg overflow-hidden">
+          <div className="bg-secondary/50 rounded-lg shadow-xl p-6 border border-gray-700">
+            <div className="aspect-video relative rounded-lg overflow-hidden bg-black/30">
               {preview && (
                 <img
                   src={preview}
@@ -144,7 +146,7 @@ export const ImageCompressor = () => {
                 />
               )}
             </div>
-            <div className="mt-4 space-y-2">
+            <div className="mt-4 space-y-2 text-gray-300">
               <div className="flex justify-between text-sm">
                 <span>Original size:</span>
                 <span>{(image.size / 1024).toFixed(2)} KB</span>
@@ -165,7 +167,7 @@ export const ImageCompressor = () => {
           <button
             onClick={downloadCompressedImage}
             disabled={isCompressing}
-            className="gradient-bg w-full py-3 px-4 rounded-lg text-white font-medium shadow-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full py-3 px-4 rounded-lg text-gray-200 font-medium shadow-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2 disabled:opacity-50 bg-secondary hover:bg-secondary/80"
           >
             {isCompressing ? (
               "Compressing..."
