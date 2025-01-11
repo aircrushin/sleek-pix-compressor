@@ -143,21 +143,21 @@ export const ImageCompressor = () => {
   };
 
   return (
-    <div className={`h-full ${isDark ? 'dark bg-black text-white' : 'bg-white text-black'} transition-colors duration-300`}>
+    <div className={`h-full ${isDark ? 'dark bg-black text-white' : 'bg-white text-black'}`}>
       <div className="w-full max-w-4xl mx-auto p-8 space-y-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">{t('title')}</h1>
           <div className="flex items-center gap-2">
             <button
               onClick={toggleLanguage}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
               aria-label="Toggle language"
             >
               <Globe className="w-6 h-6" />
             </button>
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
               aria-label="Toggle theme"
             >
               {isDark ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
@@ -179,7 +179,7 @@ export const ImageCompressor = () => {
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
           />
           <div className="space-y-4">
-            <Upload className={`w-16 h-16 mx-auto ${isDark ? 'text-gray-400' : 'text-gray-500'} group-hover:scale-110 transition-transform`} />
+            <Upload className={`w-16 h-16 mx-auto ${isDark ? 'text-gray-400' : 'text-gray-500'} group-hover:scale-110`} />
             <div>
               <p className="text-xl font-medium">{t('dropzone.title')}</p>
               <p className={`text-sm mt-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t('dropzone.subtitle')}</p>

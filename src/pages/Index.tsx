@@ -3,7 +3,7 @@ import Footer from "@/components/footer";
 
 const Index = () => {
   return (
-    <div className="flex flex-col min-h-screen bg-white">
+    <div className="flex flex-col min-h-screen bg-white dark:bg-black">
       <main className="flex-1">
         <ImageCompressor />
       </main>
