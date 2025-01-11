@@ -1,12 +1,34 @@
-import { useState } from "react";
-import { Upload, Download, Image as ImageIcon } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Upload, Download, Image as ImageIcon, Moon, Sun, Globe } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from 'react-i18next';
+import debounce from 'lodash/debounce';
 
 export const ImageCompressor = () => {
+  const { t, i18n } = useTranslation();
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string>("");
   const [compressedSize, setCompressedSize] = useState<number>(0);
   const [isCompressing, setIsCompressing] = useState(false);
+  const [isDark, setIsDark] = useState(window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const [compressionQuality, setCompressionQuality] = useState<number>(0.7);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e: MediaQueryListEvent) => setIsDark(e.matches);
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  const toggleTheme = () => {
+    setIsDark(!isDark);
+    document.documentElement.classList.toggle('dark');
+  };
+
+  const toggleLanguage = () => {
+    const newLang = i18n.language === 'zh' ? 'en' : 'zh';
+    i18n.changeLanguage(newLang);
+  };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -14,7 +36,7 @@ export const ImageCompressor = () => {
     if (file && file.type.startsWith("image/")) {
       handleImageUpload(file);
     } else {
-      toast.error("Please upload an image file");
+      toast.error(t('toast.error.upload'));
     }
   };
 
@@ -31,54 +53,56 @@ export const ImageCompressor = () => {
     await compressImage(file);
   };
 
-  const compressImage = async (file: File) => {
-    setIsCompressing(true);
-    try {
-      // Create a canvas element
-      const img = new Image();
-      img.src = URL.createObjectURL(file);
-      await new Promise((resolve) => (img.onload = resolve));
+  const debouncedCompress = useCallback(
+    debounce(async (file: File, quality: number) => {
+      setIsCompressing(true);
+      try {
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
+        await new Promise((resolve) => (img.onload = resolve));
 
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d")!;
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d")!;
 
-      // Calculate new dimensions (maintaining aspect ratio)
-      const maxWidth = 800;
-      const maxHeight = 800;
-      let width = img.width;
-      let height = img.height;
+        const maxWidth = 800;
+        const maxHeight = 800;
+        let width = img.width;
+        let height = img.height;
 
-      if (width > height) {
-        if (width > maxWidth) {
-          height = Math.round((height * maxWidth) / width);
-          width = maxWidth;
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
         }
-      } else {
-        if (height > maxHeight) {
-          width = Math.round((width * maxHeight) / height);
-          height = maxHeight;
-        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const blob = await new Promise<Blob>((resolve) =>
+          canvas.toBlob((b) => resolve(b!), "image/jpeg", quality)
+        );
+
+        setCompressedSize(blob.size);
+        toast.success(t('toast.success.compress'));
+      } catch (error) {
+        toast.error(t('toast.error.compress'));
+        console.error(error);
+      } finally {
+        setIsCompressing(false);
       }
+    }, 500),
+    []
+  );
 
-      canvas.width = width;
-      canvas.height = height;
-
-      // Draw image on canvas
-      ctx.drawImage(img, 0, 0, width, height);
-
-      // Convert to blob
-      const blob = await new Promise<Blob>((resolve) =>
-        canvas.toBlob((b) => resolve(b!), "image/jpeg", 0.7)
-      );
-
-      setCompressedSize(blob.size);
-      toast.success("Image compressed successfully!");
-    } catch (error) {
-      toast.error("Error compressing image");
-      console.error(error);
-    } finally {
-      setIsCompressing(false);
-    }
+  const compressImage = async (file: File) => {
+    await debouncedCompress(file, compressionQuality);
   };
 
   const downloadCompressedImage = async () => {
@@ -102,84 +126,133 @@ export const ImageCompressor = () => {
         link.href = URL.createObjectURL(blob);
         link.download = `compressed_${image.name}`;
         link.click();
-        toast.success("Image downloaded successfully!");
-      }, "image/jpeg", 0.7);
+        toast.success(t('toast.success.download'));
+      }, "image/jpeg", compressionQuality);
     } catch (error) {
-      toast.error("Error downloading image");
+      toast.error(t('toast.error.download'));
       console.error(error);
     }
   };
 
+  const handleQualityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newQuality = Number(e.target.value) / 100;
+    setCompressionQuality(newQuality);
+    if (image) {
+      debouncedCompress(image, newQuality);
+    }
+  };
+
   return (
-    <div className="w-full max-w-3xl mx-auto p-6 space-y-6">
-      <div
-        className="border-2 border-dashed border-gray-600 rounded-lg p-12 text-center cursor-pointer transition-colors hover:border-gray-400 relative bg-secondary/50"
-        onDrop={handleDrop}
-        onDragOver={(e) => e.preventDefault()}
-      >
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleFileInput}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-        />
-        <div className="space-y-4">
-          <Upload className="w-12 h-12 mx-auto text-gray-400" />
-          <div>
-            <p className="text-xl font-medium text-gray-200">
-              Drag and drop your image here
-            </p>
-            <p className="text-sm text-gray-400 mt-2">or click to browse</p>
+    <div className={`h-full ${isDark ? 'dark bg-black text-white' : 'bg-white text-black'} transition-colors duration-300`}>
+      <div className="w-full max-w-4xl mx-auto p-8 space-y-8">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={toggleLanguage}
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              aria-label="Toggle language"
+            >
+              <Globe className="w-6 h-6" />
+            </button>
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              aria-label="Toggle theme"
+            >
+              {isDark ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
+            </button>
           </div>
         </div>
-      </div>
 
-      {image && (
-        <div className="space-y-6 animate-fade-in">
-          <div className="bg-secondary/50 rounded-lg shadow-xl p-6 border border-gray-700">
-            <div className="aspect-video relative rounded-lg overflow-hidden bg-black/30">
-              {preview && (
-                <img
-                  src={preview}
-                  alt="Preview"
-                  className="absolute inset-0 w-full h-full object-contain"
+        <div
+          className={`border-2 border-dashed rounded-xl p-12 text-center cursor-pointer transition-all
+            ${isDark ? 'border-gray-700 hover:border-gray-500 bg-gray-900' : 'border-gray-300 hover:border-gray-400 bg-gray-50'}
+            relative group`}
+          onDrop={handleDrop}
+          onDragOver={(e) => e.preventDefault()}
+        >
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileInput}
+            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          />
+          <div className="space-y-4">
+            <Upload className={`w-16 h-16 mx-auto ${isDark ? 'text-gray-400' : 'text-gray-500'} group-hover:scale-110 transition-transform`} />
+            <div>
+              <p className="text-xl font-medium">{t('dropzone.title')}</p>
+              <p className={`text-sm mt-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t('dropzone.subtitle')}</p>
+            </div>
+          </div>
+        </div>
+
+        {image && (
+          <div className="space-y-6 animate-fade-in">
+            <div className={`rounded-xl shadow-lg p-6 ${isDark ? 'bg-gray-900 border border-gray-800' : 'bg-white border border-gray-200'}`}>
+              <div className="aspect-video relative rounded-lg overflow-hidden bg-black/10 dark:bg-white/10">
+                {preview && (
+                  <img
+                    src={preview}
+                    alt="Preview"
+                    className="absolute inset-0 w-full h-full object-contain"
+                  />
+                )}
+              </div>
+              <div className="mt-6 space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span>{t('sizes.original')}:</span>
+                  <span className="font-mono">{(image.size / 1024).toFixed(2)} KB</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>{t('sizes.compressed')}:</span>
+                  <span className="font-mono">{(compressedSize / 1024).toFixed(2)} KB</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>{t('sizes.ratio')}:</span>
+                  <span className="font-mono">{((1 - compressedSize / image.size) * 100).toFixed(1)}%</span>
+                </div>
+              </div>
+            </div>
+
+            <div className={`rounded-xl shadow-lg p-6 ${isDark ? 'bg-gray-900 border border-gray-800' : 'bg-white border border-gray-200'}`}>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">{t('compression.quality')}</span>
+                  <span className="text-sm font-mono">{Math.round(compressionQuality * 100)}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="100"
+                  value={compressionQuality * 100}
+                  onChange={handleQualityChange}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
                 />
-              )}
-            </div>
-            <div className="mt-4 space-y-2 text-gray-300">
-              <div className="flex justify-between text-sm">
-                <span>Original size:</span>
-                <span>{(image.size / 1024).toFixed(2)} KB</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span>Compressed size:</span>
-                <span>{(compressedSize / 1024).toFixed(2)} KB</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span>Compression ratio:</span>
-                <span>
-                  {((1 - compressedSize / image.size) * 100).toFixed(1)}%
-                </span>
               </div>
             </div>
-          </div>
 
-          <button
-            onClick={downloadCompressedImage}
-            disabled={isCompressing}
-            className="w-full py-3 px-4 rounded-lg text-gray-200 font-medium shadow-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2 disabled:opacity-50 bg-secondary hover:bg-secondary/80"
-          >
-            {isCompressing ? (
-              "Compressing..."
-            ) : (
-              <>
-                <Download className="w-5 h-5" />
-                Download Compressed Image
-              </>
-            )}
-          </button>
-        </div>
-      )}
+            <button
+              onClick={downloadCompressedImage}
+              disabled={isCompressing}
+              className={`w-full py-4 px-6 rounded-xl font-medium shadow-lg transition-all
+                flex items-center justify-center gap-3 disabled:opacity-50
+                ${isDark ? 
+                  'bg-white text-black hover:bg-gray-100' : 
+                  'bg-black text-white hover:bg-gray-900'}`}
+            >
+              {isCompressing ? (
+                t('button.compressing')
+              ) : (
+                <>
+                  <Download className="w-5 h-5" />
+                  {t('button.download')}
+                </>
+              )}
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

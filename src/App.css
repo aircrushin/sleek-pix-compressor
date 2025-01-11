@@ -1,3 +1,19 @@
+body {
+  margin: 0;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 #root {
   max-width: 1280px;
   margin: 0 auto;

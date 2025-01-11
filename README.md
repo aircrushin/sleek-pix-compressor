@@ -1,69 +1,51 @@
-# Welcome to your Lovable project
+# Sleek Pix Compressor
 
-## Project info
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-**URL**: https://lovable.dev/projects/b6a5f5f6-53bc-4476-8bb0-46ca99833392
+一个现代化的图片压缩工具，支持多语言和暗黑模式，提供直观的压缩质量调节功能。
 
-## How can I edit this code?
+## 功能特性
 
-There are several ways of editing your application.
+- 🖼️ 支持拖放和文件选择上传图片
+- ⚡ 实时压缩预览
+- 🎚️ 可调节压缩质量 (0-100%)
+- 🌓 自动跟随系统暗黑模式
+- 🌐 支持中英双语切换
+- 📊 显示原始大小、压缩后大小和压缩比例
+- 📥 一键下载压缩后的图片
 
-**Use Lovable**
+## 技术栈
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/b6a5f5f6-53bc-4476-8bb0-46ca99833392) and start prompting.
+- ⚛️ React
+- 🎨 Tailwind CSS
+- 🛠️ TypeScript
+- 🌐 i18next 多语言支持
+- 🚀 Vite 构建工具
 
-Changes made via Lovable will be committed automatically to this repo.
+## 快速开始
 
-**Use your preferred IDE**
+### 安装依赖
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+```bash
+npm install
+```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### 运行
 
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with .
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/b6a5f5f6-53bc-4476-8bb0-46ca99833392) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+## 项目结构
+```
+sleek-pix-compressor/
+├── src/
+│ ├── components/ # 组件目录
+│ ├── i18n/ # 多语言配置
+│ ├── pages/ # 页面组件
+│ └── main.tsx # 项目入口
+├── public/ # 静态资源
+├── tailwind.config.ts # Tailwind 配置
+├── vite.config.ts # Vite 配置
+└── README.md # 项目说明
+```
