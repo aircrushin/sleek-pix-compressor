@@ -90,7 +90,7 @@ export const ImageCompressor = () => {
         );
 
         setCompressedSize(blob.size);
-        toast.success(t('toast.success.compress'));
+      // toast.success(t('toast.success.compress'));
       } catch (error) {
         toast.error(t('toast.error.compress'));
         console.error(error);
@@ -230,7 +230,7 @@ export const ImageCompressor = () => {
                     onClick={() => handleQualityChange(0.7)}
                     className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors
                       ${compressionQuality === 0.7 ? 
-                        'bg-blue-500 text-white' : 
+                        'bg-gray-900 text-white' : 
                         'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
                   >
                     {t('quality.high')}
@@ -239,7 +239,7 @@ export const ImageCompressor = () => {
                     onClick={() => handleQualityChange(0.3)}
                     className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors
                       ${compressionQuality === 0.3 ? 
-                        'bg-blue-500 text-white' : 
+                        'bg-gray-900 text-white' : 
                         'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
                   >
                     {t('quality.medium')}
@@ -248,7 +248,7 @@ export const ImageCompressor = () => {
                     onClick={() => handleQualityChange(0.1)}
                     className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors
                       ${compressionQuality === 0.1 ? 
-                        'bg-blue-500 text-white' : 
+                        'bg-gray-900 text-white' : 
                         'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
                   >
                     {t('quality.low')}
